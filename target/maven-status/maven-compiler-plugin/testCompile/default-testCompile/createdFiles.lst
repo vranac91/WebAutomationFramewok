@@ -1,6 +1,8 @@
 framework/config/DriverType$1.class
+framework/pages/ExamplePage.class
 framework/config/DriverType$2.class
 framework/BaseDriver$1.class
+framework/tests/ExampleTest.class
 framework/config/DriverType$6.class
 framework/config/DriverType$4.class
 framework/BaseDriver.class
@@ -10,3 +12,4 @@ framework/config/DriverType$5.class
 framework/config/DriverType.class
 framework/config/DriverFactory.class
 framework/listeners/ScreenshotListener.class
+framework/pages/BasePage.class

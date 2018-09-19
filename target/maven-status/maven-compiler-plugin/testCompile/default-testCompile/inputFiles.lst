@@ -1,5 +1,8 @@
 /Users/testmac/IdeaProjects/TestFramework/src/test/java/framework/config/DriverSetup.java
+/Users/testmac/IdeaProjects/TestFramework/src/test/java/framework/pages/ExamplePage.java
 /Users/testmac/IdeaProjects/TestFramework/src/test/java/framework/config/DriverFactory.java
 /Users/testmac/IdeaProjects/TestFramework/src/test/java/framework/config/DriverType.java
 /Users/testmac/IdeaProjects/TestFramework/src/test/java/framework/listeners/ScreenshotListener.java
 /Users/testmac/IdeaProjects/TestFramework/src/test/java/framework/BaseDriver.java
+/Users/testmac/IdeaProjects/TestFramework/src/test/java/framework/pages/BasePage.java
+/Users/testmac/IdeaProjects/TestFramework/src/test/java/framework/tests/ExampleTest.java
