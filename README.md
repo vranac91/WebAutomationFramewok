@@ -9,3 +9,5 @@ The framework utilizes the standard Page Object Model pattern in Selenium, so th
 All required dependencies and plugins are added to `pom.xml` file, so the prerequisites for using the framework is having **IntelliJ** with **Maven** plugins.
 
 Detailed descriptions are added as comment blocks in each file.
+
+This description will be improved with more details in time.
