@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+    - project coordinates
+    - groupId – a unique base name of the company or group that created the project
+    - artifactId – a unique name of the project allocated to JAR files
+    - version – a version of the project (-SNAPSHOT stands for work in progress)
+    - packaging – a packaging method (e.g. WAR/JAR/ZIP)
+    -->
+
+    <groupId>TestFramework</groupId>
+    <artifactId>TestFramework</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>Test Framework Example</name>
+    <description>An example of test framework for web applications using Java/Selenium/Maven</description>
+
+    <!--
+    - PROPERTIES: placeholders of certain value that are accessible anywhere within a pom.xml file by using the notation {$name}, where "name" is the property
+    - makes upgrading the version of a dependency or a plugin easier since it needs to be changed only in the property value
+    - having properties are not mandatory, but helps in code readability and maintainability
+    -->
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+
+        <!-- Dependency versions -->
+        <phantomjsdriver.version>1.4.3</phantomjsdriver.version>
+        <selenium.version>3.14.0</selenium.version>
+        <testng.version>6.14.3</testng.version>
+
+        <!-- Plugin versions -->
+        <driver-binary-downloader-maven-plugin.version>1.0.17</driver-binary-downloader-maven-plugin.version>
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
+
+        <!-- Configurable variables
+        - threads: the number of parallel threads used to execute tests
+        - browser: name of preferred browser
+        - overwrite binaries: giving the ability to overwrite or refresh existing binaries (defaults to "false")
+        - headless: if enabled, browser will run in headless mode (without GUI)
+        - screenshot directory: specifies directory where captured screenshots will be saved
+        -->
+
+        <threads>1</threads>
+        <browser>chrome</browser>
+        <overwrite.binaries>false</overwrite.binaries>
+        <headless>true</headless>
+        <remote>false</remote>
+        <seleniumGridURL/>
+        <platform/>
+        <browserVersion/>
+        <screenshotDirectory>${project.build.directory}/screenshots</screenshotDirectory>
+    </properties>
+
+    <!--
+    - provides information about default Maven goal, name of the application, base directory for builds etc.
+    - plugins section contains information about build versions and configurations of plugins associated to the build cycle
+    -->
+    <profiles>
+        <profile>
+            <id>selenium</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- https://maven.apache.org/plugins/maven-compiler-plugin/usage.html -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>${java.version}</source>
+                            <target>${java.version}</target>
+                        </configuration>
+                        <version>${maven-compiler-plugin.version}</version>
+                    </plugin>
+                    <!-- failsafe plugin details: https://maven.apache.org/surefire/maven-failsafe-plugin/usage.html
+                     - automatically picks up methods that have IT at the end of its name
+                     -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven-failsafe-plugin.version}</version>
+                        <configuration>
+                            <!--
+                            - "methods" value searches files for all methods with the @Test annotation
+                            - thread count denotes on how many threads will all @Test methods run
+                            - thread count can be overriden by typing "maven clean verify -Dthreads=<somenumber>"
+                            -->
+                            <parallel>methods</parallel>
+                            <threadCount>${threads}</threadCount>
+                            <systemPropertyVariables>
+                                <browser>${browser}</browser>
+                                <screenshotDirectory>${screenshotDirectory}</screenshotDirectory>
+                                <remoteDriver>${remote}</remoteDriver>
+                                <gridURL>${seleniumGridURL}</gridURL>
+                                <desiredPlatform>${platform}</desiredPlatform>
+                                <desiredBrowserVersion>${browserVersion}</desiredBrowserVersion>
+                                <headless>${headless}</headless>
+                                <!--Set properties passed in by the driver binary downloader-->
+                                <phantomjs.binary.path>${phantomjs.binary.path}</phantomjs.binary.path>
+                                <webdriver.chrome.driver>${webdriver.chrome.driver}</webdriver.chrome.driver>
+                                <webdriver.ie.driver>${webdriver.ie.driver}</webdriver.ie.driver>
+                                <webdriver.opera.driver>${webdriver.opera.driver}</webdriver.opera.driver>
+                                <webdriver.gecko.driver>${webdriver.gecko.driver}</webdriver.gecko.driver>
+                                <webdriver.edge.driver>${webdriver.edge.driver}</webdriver.edge.driver>
+                            </systemPropertyVariables>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <!-- test runs are executed in the integration phase, and build will fail if any test fails;
+                                    this can be bypassed by removing the "verify" goal -->
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.lazerycode.selenium</groupId>
+                        <artifactId>driver-binary-downloader-maven-plugin</artifactId>
+                        <version>${driver-binary-downloader-maven-plugin.version}</version>
+                        <configuration>
+                            <rootStandaloneServerDirectory>${project.basedir}/src/test/resources/selenium_standalone_binaries</rootStandaloneServerDirectory>
+                            <downloadedZipFileDirectory>${project.basedir}/src/test/resources/selenium_standalone_zips</downloadedZipFileDirectory>
+                            <customRepositoryMap>${project.basedir}/src/test/resources/RepositoryMap.xml</customRepositoryMap>
+                            <overwriteFilesThatExist>${overwrite.binaries}</overwriteFilesThatExist>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>selenium</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <!--
+    - libraries that the code depends upon, e.g. Selenium, TestNG, Appium...
+    - setting scope to "test" means that these dependencies are only loaded when tests are run
+    - all dependencies can be found on https://mvnrepository.com/
+    - format ${something.version} reads the version specified in <properties> section of the pom.xml file
+    - declaration is made by specifying groupId, artifactId and version data
+    -->
+
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-driver</artifactId>
+            <version>${selenium.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.lazerycode.selenium</groupId>
+            <artifactId>query</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>
